@@ -28,7 +28,6 @@
 ## in 34s, resolve: 12s, download: 15s, build: 5s, install: 2s
 
 #' @export
-#' @importFrom prettyunits pretty_bytes pretty_dt
 
 print.pkgman_install_result <- function(x, ...) {
 
@@ -45,12 +44,12 @@ print.pkgman_install_result <- function(x, ...) {
   dlbytes <- sum(x$bytes[x$download_status == "Got"])
   build_time <- sum(unlist(x$build_time), na.rm = TRUE)
   inst_time <- sum(unlist(x$install_time), na.rm = TRUE)
-  total_time <- pretty_dt(attr(x, "total_time")) %||% "???s"
+  total_time <- prettyunits::pretty_dt(attr(x, "total_time")) %||% "???s"
 
-  cli$alert_success(paste0(
+  cli::cli$alert_success(paste0(
     direct, " + ", deps, " pkgs | ",
     "kept ", curr, ", updated ", upd, ", new ", newly, " | ",
-    "downloaded ", downloaded, " (", pretty_bytes(dlbytes), ")",
+    "downloaded ", downloaded, " (", prettyunits::pretty_bytes(dlbytes), ")",
     " [{timestamp {total_time}}]"))
 }
 
@@ -66,32 +65,32 @@ ask_for_confirmation <- function(sol) {
 
   if (! (newly + upd)) return()
 
-  cli$text(" ")
+  cli::cli$text(" ")
 
   package_list <- function(x) {
-    cli$div(
+    cli::cli$div(
       class = "pkglist",
       theme = list(div.pkglist = list("margin-left" = 2))
     )
-    cli$text(paste(x, collapse = ", "))
-    cli$text(" ")
+    cli::cli$text(paste(x, collapse = ", "))
+    cli::cli$text(" ")
   }
 
   if (newly) {
-    cli$alert("Newly installing {newly} packages:")
+    cli::cli$alert("Newly installing {newly} packages:")
     package_list(sol$ref[sol$lib_status == "new"])
   }
   if (upd) {
-    cli$alert("Updating {upd} packages:")
+    cli::cli$alert("Updating {upd} packages:")
     package_list(sol$ref[sol$lib_status == "update"])
   }
   if (curr + noupd) {
-    cli$alert("Not updating {curr + noupd} packages.")
-    cli$text(" ")
+    cli::cli$alert("Not updating {curr + noupd} packages.")
+    cli::cli$text(" ")
   }
 
   yesno("  Do you want to continue? (Y/n) ", "Installtion aborted")
-  cli$text(" ")
+  cli::cli$text(" ")
 }
 
 yesno <-  function(q, msg = "Aborted.") {
